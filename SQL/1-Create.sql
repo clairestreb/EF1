@@ -22,31 +22,16 @@ if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Employee]'
 drop table [dbo].[Employee]
 GO
 
-if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Site]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
-drop table [dbo].[Site]
-GO
-
 if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[User]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
 drop table [dbo].[User]
 GO
 
-CREATE TABLE [dbo].[Employee] (
-	[Id] [int] IDENTITY (1, 1) NOT NULL CONSTRAINT [PK_Employee] PRIMARY KEY CLUSTERED,
-	[UserId] int NULL ,
-	[Notes] [nvarchar] (max) NULL ,
-	[HiredDate] [datetime] NULL ,
-	[EmployeeNumber] [nvarchar] (32) NULL ,
-	[EmpType] [nvarchar] (3) NULL ,
-	[CreatedBy] [int] NULL ,
-	[ModifiedBy] [int] NULL ,
-	[CreatedDate] [datetime] NULL CONSTRAINT [DF_Employee_CreatedDate] DEFAULT (GetDate()),
-	[ModifiedDate] [datetime] NULL CONSTRAINT [DF_Employee_ModifiedDate] DEFAULT (GetDate()),
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+if exists (select * from dbo.sysobjects where id = object_id(N'[dbo].[Site]') and OBJECTPROPERTY(id, N'IsUserTable') = 1)
+drop table [dbo].[Site]
 GO
-CREATE  INDEX [IX_Employee_UserId] ON [dbo].[Employee]([UserId]) WITH  FILLFACTOR = 90 ON [PRIMARY]
-GO
-CREATE  INDEX [IX_Employee_HiredDate] ON [dbo].[Employee]([HiredDate]) WITH  FILLFACTOR = 90 ON [PRIMARY]
-GO
+
+
+/* create tables */
 
 CREATE TABLE [dbo].[Site] (
 	[Id] [int] IDENTITY(1 ,1) NOT NULL CONSTRAINT [PK_Site] PRIMARY KEY CLUSTERED ,
@@ -74,7 +59,7 @@ CREATE TABLE [dbo].[User] (
 	[LastName] [nvarchar] (64) NOT NULL ,
 	[MiddleInitials] [nvarchar] (16) NULL ,
 	[FirstName] [nvarchar] (64) NOT NULL ,
-	[SiteId] [int] NULL ,
+	[SiteId] [int] NULL CONSTRAINT [FK_User_SiteId] REFERENCES [Site]([Id]),
 	[Address1] [nvarchar] (128) NULL ,
 	[Address2] [nvarchar] (128) NULL ,
 	[City] [nvarchar] (64) NULL ,
@@ -82,7 +67,7 @@ CREATE TABLE [dbo].[User] (
 	[PostalCode] [nvarchar] (16) NULL ,
 	[PhoneNumber] [nvarchar] (32) NULL ,
 	[Email] [nvarchar](255) NULL,
-	[Comment] [nvarchar] (max) NULL ,
+	[Comments] [nvarchar] (max) NULL ,
 	[CreatedBy] [int] NULL ,
 	[ModifiedBy] [int] NULL ,
 	[CreatedDate] [datetime] NULL CONSTRAINT [DF_User_CreatedDate] DEFAULT (GetDate()),
@@ -103,4 +88,24 @@ ALTER TABLE [dbo].[User]
 		[MiddleInitials],
 		[LastName]
 	) WITH FILLFACTOR = 90 ON [PRIMARY]
+GO
+
+-- UserId = An employee does not have to be a user
+CREATE TABLE [dbo].[Employee] (
+	[Id] [int] IDENTITY (1, 1) NOT NULL CONSTRAINT [PK_Employee] PRIMARY KEY CLUSTERED,
+	[UserId] int NULL CONSTRAINT [FK_Employee_UserId] REFERENCES [User]([Id]),
+	[Notes] [nvarchar] (max) NULL ,
+	[HiredDate] [datetime] NULL ,
+	[EmployeeNumber] [nvarchar] (32) NULL ,
+	[EmpType] [nvarchar] (3) NULL ,
+	[Comments] [nvarchar] (max) NULL ,
+	[CreatedBy] [int] NULL ,
+	[ModifiedBy] [int] NULL ,
+	[CreatedDate] [datetime] NULL CONSTRAINT [DF_Employee_CreatedDate] DEFAULT (GetDate()),
+	[ModifiedDate] [datetime] NULL CONSTRAINT [DF_Employee_ModifiedDate] DEFAULT (GetDate()),
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+CREATE  INDEX [IX_Employee_UserId] ON [dbo].[Employee]([UserId]) WITH  FILLFACTOR = 90 ON [PRIMARY]
+GO
+CREATE  INDEX [IX_Employee_HiredDate] ON [dbo].[Employee]([HiredDate]) WITH  FILLFACTOR = 90 ON [PRIMARY]
 GO

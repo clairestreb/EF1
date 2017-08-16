@@ -68,9 +68,10 @@ BEGIN
 END
 GO
 
-EXECUTE [dbo].[procTempInsert] 'User1',  'CON'
-EXECUTE [dbo].[procTempInsert] 'Demo1',  'FTE'
-EXECUTE [dbo].[procTempInsert] 'Admin1', 'FTE'
+EXECUTE [dbo].[procTempInsert] 'EmpNonUser',  'CON'
+EXECUTE [dbo].[procTempInsert] 'User1',       'CON'
+EXECUTE [dbo].[procTempInsert] 'Demo1',       'FTE'
+EXECUTE [dbo].[procTempInsert] 'Admin1',      'FTE'
 
 drop procedure [dbo].[procTempInsert]
 GO
